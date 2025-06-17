@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Event Registrations - Event Management System</title>
+    <link rel="stylesheet" th:href="@{/styles.css}">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <header>
+        <nav class="navbar">
+            <div class="logo">
+                <img th:src="@{/images/logo.png}" alt="Logo" style="height: 40px; vertical-align: middle; margin-right: 5px;">
+                <strong>GoEvents</strong>
+            </div>
+            <div class="nav-links">
+                <a th:href="@{/admin}" class="btn btn-outline-secondary">Back to Admin</a>
+            </div>
+        </nav>
+    </header>
+
+    <main class="container mt-4">
+        <h1>Event Registrations</h1>
+        
+        <div class="row mt-4">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Event</th>
+                                        <th>Attendee</th>
+                                        <th>Email</th>
+                                        <th>Ticket Type</th>
+                                        <th>Number of Tickets</th>
+                                        <th>Total Price</th>
+                                        <th>Payment Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr th:each="registration : ${registrations}">
+                                        <td th:text="${registration.event?.name}">Event Name</td>
+                                        <td th:text="${registration.attendeeName}">Attendee Name</td>
+                                        <td th:text="${registration.attendeeEmail}">Email</td>
+                                        <td th:text="${registration.ticketType?.name}">Ticket Type</td>
+                                        <td th:text="${registration.numberOfTickets}">Number of Tickets</td>
+                                        <td th:text="${registration.totalPrice != null ? '$' + #numbers.formatDecimal(registration.totalPrice, 1, 2) : 'N/A'}">Total Price</td>
+                                        <td>
+                                            <span th:if="${registration.payments != null and not #lists.isEmpty(registration.payments)}" 
+                                                  class="badge" 
+                                                  th:classappend="${registration.payments[0].status == 'COMPLETED' ? 'bg-success' : 
+                                                                  registration.payments[0].status == 'PENDING' ? 'bg-warning' : 'bg-danger'}"
+                                                  th:text="${registration.payments[0].status}">Status</span>
+                                            <span th:unless="${registration.payments != null and not #lists.isEmpty(registration.payments)}" 
+                                                  class="badge bg-secondary">No Payment</span>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+</body>
+</html> 

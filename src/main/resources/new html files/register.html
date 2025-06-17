@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register - Event Management System</title>
+    <link rel="stylesheet" th:href="@{/styles.css}">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <header>
+        <nav class="navbar">
+            <div class="logo">
+                <img th:src="@{/images/logo.png}" alt="Logo" style="height: 40px; vertical-align: middle; margin-right: 5px;">
+                <strong>GoEvents</strong>
+            </div>
+            <div class="nav-links">
+                <a th:href="@{/}" class="btn btn-outline-secondary">Home</a>
+                <a th:href="@{/events}" class="btn btn-outline-primary">Events</a>
+            </div>
+        </nav>
+    </header>
+
+    <main class="container mt-4">
+        <h1>Event Registration</h1>
+        <form th:action="@{/register}" method="post" class="registration-form">
+            <div class="mb-3">
+                <label for="event" class="form-label">Select Event</label>
+                <select class="form-select" id="event" name="event.id" required th:onchange="'updateTicketTypes(this.value)'">
+                    <option value="">Choose an event...</option>
+                    <option th:each="event : ${events}"
+                            th:value="${event.id}"
+                            th:text="${event.name + ' - ' + event.date + ' at ' + event.location}">
+                        Event Name - Date at Location
+                    </option>
+                </select>
+            </div>
+
+            <div class="mb-3">
+                <label for="ticketType" class="form-label">Ticket Type</label>
+                <select class="form-select" id="ticketType" name="ticketType.id" required>
+                    <option value="">Select ticket type...</option>
+                    <option th:each="ticketType : ${ticketTypes}"
+                            th:value="${ticketType.id}"
+                            th:text="${ticketType.name + ' - $' + ticketType.price}">
+                        Ticket Type - Price
+                    </option>
+                </select>
+            </div>
+
+            <div class="mb-3">
+                <label for="numberOfTickets" class="form-label">Number of Tickets</label>
+                <input type="number" class="form-control" id="numberOfTickets" name="numberOfTickets" min="1" required>
+            </div>
+
+            <div class="mb-3">
+                <label for="attendeeName" class="form-label">Your Name</label>
+                <input type="text" class="form-control" id="attendeeName" name="attendeeName" required>
+            </div>
+
+            <div class="mb-3">
+                <label for="attendeeEmail" class="form-label">Email Address</label>
+                <input type="email" class="form-control" id="attendeeEmail" name="attendeeEmail" required>
+            </div>
+
+            <button type="submit" class="btn btn-primary">Complete Registration</button>
+        </form>
+    </main>
+
+    <script th:inline="javascript">
+        function updateTicketTypes(eventId) {
+            if (!eventId) return;
+            
+            fetch(`/api/events/${eventId}/ticket-types`)
+                .then(response => response.json())
+                .then(ticketTypes => {
+                    const select = document.getElementById('ticketType');
+                    select.innerHTML = '<option value="">Select ticket type...</option>';
+                    
+                    ticketTypes.forEach(ticketType => {
+                        const option = document.createElement('option');
+                        option.value = ticketType.id;
+                        option.textContent = `${ticketType.name} - $${ticketType.price}`;
+                        select.appendChild(option);
+                    });
+                })
+                .catch(error => console.error('Error fetching ticket types:', error));
+        }
+    </script>
+</body>
+</html> 
